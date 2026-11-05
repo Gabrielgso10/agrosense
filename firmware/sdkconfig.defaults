@@ -1,0 +1,21 @@
+# --- Alvo e desempenho ---
+CONFIG_IDF_TARGET="esp32s3"
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
+CONFIG_COMPILER_OPTIMIZATION_PERF=y
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=12288
+
+# --- Memória: módulo N16R8 (16 MB de flash, 8 MB de PSRAM octal) ---
+# Se a placa for N8R8, troque para CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE_16MB=y
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_SPEED_80M=y
+
+# --- Partição de app de 4 MB (só o modelo já passa de 600 KB) ---
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# --- ESP-NN: otimizado e bit-exato com a referência (teste de ouro exato) ---
+# Para o experimento "sem ESP-NN", troque por CONFIG_NN_ANSI_C=y (ou use idf.py menuconfig)
+CONFIG_NN_OPTIMIZED=y
+# CONFIG_NN_SKIP_NUDGE is not set

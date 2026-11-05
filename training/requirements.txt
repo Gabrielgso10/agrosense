@@ -1,0 +1,12 @@
+# Versões testadas juntas em Python 3.12, Linux x86-64 (no Windows, use o WSL2).
+# A API de conversão do TensorFlow está em transição (tf.lite -> LiteRT): não atualize sem testar.
+tensorflow==2.21.0
+keras==3.15.1
+ai-edge-litert==2.2.0
+tflite-micro==0.dev20260930024714
+tensorflow-datasets==4.9.10
+numpy==2.5.3
+scikit-learn==1.9.1
+matplotlib==3.11.2
+pillow==12.3.0
+pytest==9.1.1

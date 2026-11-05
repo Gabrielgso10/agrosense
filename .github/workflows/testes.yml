@@ -1,0 +1,20 @@
+# Roda os três conjuntos de testes a cada push: se alguém mudar o pré-processamento
+# de um lado sem o outro, o GitHub avisa antes de chegar na placa.
+name: testes
+on: [push, pull_request]
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Dependências
+        run: pip install -r training/requirements.txt
+      - name: Pipeline de treino
+        run: cd training && python -m pytest
+      - name: Lógica do firmware
+        run: firmware/test/host/run.sh
+      - name: Paridade firmware x TensorFlow
+        run: cd firmware/test/host && python test_resize_parity.py

@@ -1,0 +1,19 @@
+menu "AgroSense"
+
+config AGROSENSE_WIFI_SSID
+    string "Wi-Fi: nome da rede (vazio = modo offline)"
+    default ""
+
+config AGROSENSE_WIFI_PASSWORD
+    string "Wi-Fi: senha"
+    default ""
+
+config AGROSENSE_MQTT_URI
+    string "Broker MQTT"
+    default "mqtt://192.168.0.10"
+
+config AGROSENSE_VISION_SECONDS
+    int "Intervalo entre classificações da câmera (s)"
+    default 300
+
+endmenu

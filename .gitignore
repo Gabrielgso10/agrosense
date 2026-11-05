@@ -1,0 +1,21 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Dados e artefatos grandes (o .tflite e os fontes gerados do firmware SÃO versionados)
+data/*
+!data/.gitkeep
+models/saved_model/
+models/*.npz
+models/model.keras
+
+# ESP-IDF (sdkconfig é gerado a partir do sdkconfig.defaults; dependencies.lock deve ser versionado)
+firmware/build/
+firmware/managed_components/
+firmware/sdkconfig
+firmware/sdkconfig.old
+
+# Arquivos temporários do Word (aparecem enquanto o .docx está aberto)
+~$*

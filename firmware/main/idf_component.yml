@@ -1,0 +1,8 @@
+dependencies:
+  idf: ">=5.1"
+  espressif/esp-tflite-micro: "~1.4.1"
+  espressif/esp32-camera: "^2.1.8"
+  esp-idf-lib/i2cdev: "^2.1.2"
+  esp-idf-lib/ads111x: "^1.1.14"
+  esp-idf-lib/bh1750: "^1.1.7"
+  esp-idf-lib/bmp280: "^1.0.7"

@@ -1,0 +1,13 @@
+{
+  "amostras": 42,
+  "acuracia_keras_float": 1.0,
+  "acuracia_litert_int8": 0.9761904761904762,
+  "acuracia_tflm_int8": 0.9761904761904762,
+  "concordancia_float_vs_int8": 0.9761904761904762,
+  "concordancia_litert_vs_tflm": 1.0,
+  "max_diff_litert_vs_tflm_lsb": 0,
+  "arena_tflm_bytes": 210544,
+  "modelo_bytes": 645072,
+  "golden_indice": 0,
+  "golden_classe": "suculenta"
+}

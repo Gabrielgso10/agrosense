@@ -1,0 +1,6 @@
+* text=auto
+# Scripts precisam de fim de linha Unix, mesmo editados no Windows
+*.sh text eol=lf
+*.docx binary
+*.tflite binary
+*.png binary
