@@ -4,3 +4,5 @@
 *.docx binary
 *.tflite binary
 *.png binary
+
+*.jpg binary

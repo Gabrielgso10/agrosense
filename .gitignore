@@ -7,6 +7,10 @@ __pycache__/
 # Dados e artefatos grandes (o .tflite e os fontes gerados do firmware SÃO versionados)
 data/*
 !data/.gitkeep
+# Lote original de fotos do TCC, importado do Drive
+!data/originais/
+data/originais/*
+!data/originais/2026-11-06/
 models/saved_model/
 models/*.npz
 models/model.keras
