@@ -1,6 +1,7 @@
-// Tabela de perfis por espécie — responsabilidade do Leonardo.
-// Os valores abaixo são EXEMPLOS para o protótipo funcionar; substitua pelos
-// definidos para cada espécie (FAO 56 e literatura da fundamentação).
+// Perfis das espécies do protótipo — responsabilidade do Leonardo.
+// p vem da Tabela 22 da FAO 56 (ALLEN et al., 1998). Os limiares de cada vaso saem de p
+// e da calibração do vaso (capacidade de campo e ponto de murcha, em app_config.h).
+// Tempo máximo e intervalo dependem da vazão da bomba e do tamanho do vaso: ajustar na bancada.
 // O rótulo precisa ser idêntico ao nome da pasta do dataset.
 #include <cstring>
 
@@ -10,11 +11,12 @@ namespace agrosense {
 namespace {
 
 const SpeciesProfile kProfiles[] = {
-    //  rótulo          rega   liga<%  desliga>=%  máx. s  intervalo s
-    {"suculenta",       true,  15,     30,         10,     6 * 3600},
-    {"folha larga",     true,  40,     60,         20,     2 * 3600},
-    {"flor vermelha",   true,  35,     55,         15,     2 * 3600},
-    {"vazio",           false, 0,      0,          0,      0},
+    //  rótulo       rega   p (FAO 56)  máx. s  intervalo s
+    {"alface",       true,  0.30f,      15,     3600},  // Lettuce
+    {"cebolinha",    true,  0.30f,      15,     3600},  // Onions - green
+    {"rucula",       true,  0.30f,      15,     3600},  // não consta na tabela: mesmo p da
+                                                       // alface e do rabanete (premissa)
+    {"vazio",        false, 0.00f,      0,      0},
 };
 
 }  // namespace

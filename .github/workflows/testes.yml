@@ -18,3 +18,5 @@ jobs:
         run: firmware/test/host/run.sh
       - name: Paridade firmware x TensorFlow
         run: cd firmware/test/host && python test_resize_parity.py
+      - name: Painel
+        run: pip install -r painel/requirements.txt && cd painel && python -m pytest

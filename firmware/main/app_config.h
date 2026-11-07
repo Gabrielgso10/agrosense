@@ -22,12 +22,29 @@ constexpr Roi kPotRois[kNumPots] = {{0, 60, 106}, {107, 60, 106}, {214, 60, 106}
 constexpr int kPotSoilChannel[kNumPots] = {0, 1, 2};               // canal do ADS1115
 constexpr float kSoilDryVolts[kNumPots] = {2.80f, 2.80f, 2.80f};   // calibrar: sensor no ar
 constexpr float kSoilWetVolts[kNumPots] = {1.20f, 1.20f, 1.20f};   // calibrar: sensor na água
+// Calibração do solo de cada vaso no índice de umidade (%): capacidade de campo (1 a 2 h depois
+// de uma rega completa, quando a água para de escorrer) e ponto de murcha do substrato.
+// Os limiares de ligar e desligar saem daqui e do p de cada espécie (FAO 56).
+constexpr int kSoilFieldCapacityPct[kNumPots] = {70, 70, 70};
+constexpr int kSoilWiltingPct[kNumPots] = {20, 20, 20};
+
+// Espécie fixa por vaso (nullptr = a câmera decide). Na germinação o broto ainda não é
+// reconhecível: com a espécie fixa o nó rega e as fotos já saem rotuladas para o dataset.
+// Troquem por {nullptr, nullptr, nullptr} quando o modelo treinado com as fotos de vocês estiver gravado.
+constexpr const char* kFixedSpecies[kNumPots] = {"alface", "cebolinha", "rucula"};
+constexpr int kPhotoJpegQuality = 60;  // 1 a 100; QVGA fica com ~10 a 20 KB
+
 constexpr int kPumpGpio[kNumPots] = {14, 21, 47};
 constexpr bool kRelayActiveLow = true;  // a maioria dos módulos de relé liga com nível baixo
 
 // Boia do reservatório: -1 desativa a trava
 constexpr int kTankSwitchGpio = 42;
 constexpr int kTankHasWaterLevel = 0;  // nível lido quando há água (boia com pull-up)
+
+// Telemetria: quanto esperar pela rede e pela confirmação das mensagens antes de dormir
+constexpr int kTelemetryConnectTimeoutMs = 8000;
+constexpr int kTelemetryFlushTimeoutMs = 3000;
+constexpr int kContinuousReportSeconds = 60;  // modo contínuo: relatório completo a cada minuto
 
 // Espécie: confiança mínima e classificações seguidas para confirmar
 constexpr float kMinConfidence = 0.60f;

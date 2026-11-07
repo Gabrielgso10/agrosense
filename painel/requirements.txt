@@ -1,0 +1,7 @@
+# Versões testadas juntas em Python 3.12 (mesmo Pillow e pytest do treino)
+fastapi==0.162.0
+uvicorn==0.54.0
+paho-mqtt==2.2.0
+pillow==12.3.0
+httpx==0.28.1
+pytest==9.1.1

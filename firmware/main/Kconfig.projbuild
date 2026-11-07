@@ -12,8 +12,22 @@ config AGROSENSE_MQTT_URI
     string "Broker MQTT"
     default "mqtt://192.168.0.10"
 
+config AGROSENSE_DEEP_SLEEP
+    bool "Dormir em sono profundo entre os ciclos"
+    default y
+    help
+        Desligue para demonstrações na bancada: o nó fica acordado e o log
+        continua visível no monitor serial (a USB cai durante o sono profundo).
+
+config AGROSENSE_SLEEP_SECONDS
+    int "Período de amostragem com sono profundo (s)"
+    depends on AGROSENSE_DEEP_SLEEP
+    default 600
+
 config AGROSENSE_VISION_SECONDS
-    int "Intervalo entre classificações da câmera (s)"
-    default 300
+    int "Intervalo entre reverificações da espécie pela câmera (s)"
+    default 3600
+    help
+        A câmera também roda sempre que um vaso ainda não tem espécie confirmada.
 
 endmenu

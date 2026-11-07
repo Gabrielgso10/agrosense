@@ -23,3 +23,6 @@ firmware/sdkconfig.old
 
 # Arquivos temporários do Word (aparecem enquanto o .docx está aberto)
 ~$*
+
+# Banco de dados do painel (telemetria e fotos de cada instalação)
+painel/*.db

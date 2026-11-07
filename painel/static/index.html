@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgroSense — bancada</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+  <link rel="stylesheet" href="painel.css">
+</head>
+<body>
+  <header class="topo">
+    <div>
+      <h1>AgroSense</h1>
+      <p class="sub">Bancada de irrigação com reconhecimento de espécies</p>
+    </div>
+    <p id="no" class="no" role="status" aria-live="polite">Aguardando o nó</p>
+  </header>
+
+  <p id="aviso" class="aviso" hidden></p>
+
+  <main>
+    <section class="bancada" aria-label="Bancada">
+      <figure class="foto">
+        <div class="foto-quadro">
+          <img id="foto" alt="Foto da bancada tirada pela câmera do nó" hidden>
+          <svg id="foto-marcas" class="foto-marcas" aria-hidden="true"></svg>
+          <p id="foto-vazia" class="foto-vazia">A foto aparece depois da primeira classificação da câmera.</p>
+        </div>
+        <figcaption id="foto-legenda">Sem foto ainda</figcaption>
+      </figure>
+
+      <aside class="ambiente" aria-labelledby="titulo-ambiente">
+        <h2 id="titulo-ambiente">Ambiente</h2>
+        <dl id="ambiente">
+          <div><dt>Temperatura</dt><dd id="amb-temp">—</dd></div>
+          <div><dt>Umidade do ar</dt><dd id="amb-umid">—</dd></div>
+          <div><dt>Luz</dt><dd id="amb-luz">—</dd></div>
+          <div><dt>Reservatório</dt><dd id="amb-res">—</dd></div>
+        </dl>
+        <p id="amb-hora" class="nota"></p>
+      </aside>
+    </section>
+
+    <section aria-labelledby="titulo-vasos">
+      <div class="faixa-titulo">
+        <h2 id="titulo-vasos">Vasos</h2>
+        <div class="janela" role="group" aria-label="Período do histórico">
+          <button type="button" data-horas="24" aria-pressed="true">24 horas</button>
+          <button type="button" data-horas="168" aria-pressed="false">7 dias</button>
+        </div>
+      </div>
+      <div id="vasos" class="vasos">
+        <p class="vazio-geral">Nenhuma leitura do nó ainda. Confira se ele está ligado e se o broker MQTT é o mesmo
+          configurado no menuconfig.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="titulo-regas">
+      <h2 id="titulo-regas">Regas recentes</h2>
+      <ol id="regas" class="regas"></ol>
+    </section>
+  </main>
+
+  <script src="painel.js"></script>
+</body>
+</html>

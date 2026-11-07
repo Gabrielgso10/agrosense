@@ -31,8 +31,19 @@ struct PotState {
   bool has_stopped = false;
 };
 
+// Limiares do vaso no índice de umidade (%): liga abaixo de low, desliga ao chegar em high.
+struct Thresholds {
+  int low;
+  int high;
+};
+
+// FAO 56: rega-se quando a planta consumiu a fração p da água disponível entre a
+// capacidade de campo e o ponto de murcha. p é limitado a 0,1..0,8, como na FAO.
+Thresholds ThresholdsFromFao(float p, int field_capacity_pct, int wilting_pct);
+
 struct PotInputs {
   const SpeciesProfile* profile;  // nullptr = espécie desconhecida
+  Thresholds limits;
   bool soil_valid;
   int soil_pct;
   bool tank_ok;

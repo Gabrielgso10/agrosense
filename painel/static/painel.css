@@ -1,0 +1,149 @@
+/* AgroSense — painel da bancada. Paleta de folha, terra e água; sem dependências externas. */
+:root {
+  --fundo: #edf2ec;
+  --superficie: #f8faf7;
+  --tinta: #1e2b23;
+  --tinta-2: #55655a;
+  --linha: #cfd9cf;
+  --solo: #86664a;
+  --solo-claro: #e6dccd;
+  --agua: #2c74b0;
+  --agua-clara: rgba(44, 116, 176, 0.14);
+  --folha: #3d7a3a;
+  --alerta: #a8650f;
+  --serifa: "Sitka Heading", "Iowan Old Style", Charter, "Bitstream Charter", Georgia, serif;
+  --sans: "Segoe UI", "Helvetica Neue", Roboto, Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }  /* nenhuma regra de display pode reexibir o que está oculto */
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--tinta);
+  font: 16px/1.5 var(--sans);
+  font-variant-numeric: tabular-nums;
+}
+
+h1, h2, h3 { font-family: var(--serifa); font-weight: 600; line-height: 1.15; margin: 0; }
+h1 { font-size: 2rem; letter-spacing: -0.01em; }
+h2 { font-size: 1.35rem; }
+
+.topo, main, .aviso { max-width: 1180px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+
+.topo {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 16px;
+  padding-top: 28px; padding-bottom: 20px;
+}
+.sub { margin: 4px 0 0; color: var(--tinta-2); }
+
+.no { margin: 0; display: flex; align-items: center; gap: 8px; color: var(--tinta-2); text-align: right; }
+.no::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--linha); flex: none; }
+.no[data-estado="online"]::before { background: var(--folha); }
+.no[data-estado="dormindo"]::before { background: var(--agua); }
+.no[data-estado="offline"]::before { background: var(--alerta); }
+
+.aviso {
+  background: #fbefd9; color: #5a3a06; border-left: 4px solid var(--alerta);
+  padding-top: 10px; padding-bottom: 10px; margin-bottom: 16px;
+}
+
+main section { margin-bottom: 36px; }
+
+/* --- bancada: a foto é a peça principal --- */
+.bancada { display: grid; grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr); gap: 24px; align-items: start; }
+.foto { margin: 0; }
+.foto-quadro {
+  position: relative; aspect-ratio: 4 / 3; background: #dfe6dd; overflow: hidden;
+  border-radius: 6px; border: 1px solid var(--linha);
+}
+.foto-quadro img, .foto-marcas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.foto-quadro img { object-fit: contain; }
+.foto-vazia { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding: 24px;
+  color: var(--tinta-2); text-align: center; }
+.foto-marcas rect { fill: none; stroke: #fff; stroke-width: 1.5; }
+.foto-marcas .etiqueta { fill: rgba(30, 43, 35, 0.78); }
+.foto-marcas text { fill: #fff; font-family: var(--sans); font-weight: 600; }
+.foto figcaption { margin-top: 8px; color: var(--tinta-2); font-size: 0.9rem; }
+
+.ambiente { background: var(--superficie); border-top: 3px solid var(--solo); padding: 18px 20px 20px; }
+.ambiente h2 { margin-bottom: 12px; }
+.ambiente dl { margin: 0; display: grid; gap: 14px; }
+.ambiente dt { color: var(--tinta-2); font-size: 0.9rem; }
+.ambiente dd { margin: 0; font-size: 1.5rem; }
+.ambiente dd.alerta { color: var(--alerta); }
+.nota { margin: 14px 0 0; color: var(--tinta-2); font-size: 0.85rem; }
+
+/* --- vasos --- */
+.faixa-titulo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 12px; }
+.janela { display: flex; border: 1px solid var(--linha); border-radius: 999px; overflow: hidden; }
+.janela button {
+  font: inherit; font-size: 0.9rem; padding: 6px 14px; border: 0; background: transparent; color: var(--tinta-2);
+  cursor: pointer;
+}
+.janela button[aria-pressed="true"] { background: var(--tinta); color: var(--superficie); }
+button:focus-visible { outline: 3px solid var(--agua); outline-offset: 2px; }
+
+.vasos { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+.vazio-geral { color: var(--tinta-2); grid-column: 1 / -1; }
+
+.vaso { background: var(--superficie); border-top: 3px solid var(--folha); padding: 18px 20px 20px; }
+.vaso.sem-especie { border-top-color: var(--linha); }
+
+/* etiqueta de herbário: nome popular, nome científico e de onde veio a espécie */
+.herbario { padding-bottom: 12px; margin-bottom: 16px; border-bottom: 1px dashed var(--linha); }
+.herbario h3 { font-size: 1.6rem; }
+.herbario .cientifico { font-family: var(--serifa); font-style: italic; color: var(--tinta-2); margin: 2px 0 6px; }
+.origem { font-size: 0.85rem; color: var(--tinta-2); margin: 0; }
+.origem .fixa { color: var(--alerta); }
+
+.leitura { display: grid; grid-template-columns: 76px 1fr; gap: 20px; align-items: stretch; }
+
+/* coluna de solo: o vaso visto em corte, com a água subindo até a umidade lida */
+.coluna {
+  position: relative; height: 220px; background: var(--solo-claro);
+  border: 2px solid var(--solo); border-top-width: 0; border-radius: 0 0 16px 16px; overflow: hidden;
+}
+.coluna .agua {
+  position: absolute; left: 0; right: 0; bottom: 0; background: var(--agua); opacity: 0.85;
+  transition: height 700ms ease;
+}
+.coluna .faixa {
+  position: absolute; left: 0; right: 0; background: var(--agua-clara);
+  border-top: 2px dashed var(--tinta); border-bottom: 2px dashed var(--tinta);
+}
+
+.numeros { display: flex; flex-direction: column; justify-content: space-between; }
+.umidade { font-size: 2.6rem; line-height: 1; font-family: var(--serifa); }
+.umidade small { font-size: 1rem; color: var(--tinta-2); font-family: var(--sans); margin-left: 6px; }
+.limites { margin: 8px 0 0; padding: 0; list-style: none; color: var(--tinta-2); font-size: 0.92rem; }
+.bomba { font-weight: 600; margin: 10px 0 2px; display: flex; align-items: center; gap: 6px; }
+.bomba.ligada { color: var(--agua); }
+.motivo { margin: 0; color: var(--tinta-2); font-size: 0.92rem; }
+.ultima { margin: 6px 0 0; color: var(--tinta-2); font-size: 0.85rem; }
+
+.grafico { margin-top: 18px; }
+.grafico svg { width: 100%; height: 120px; display: block; }
+.grafico .eixo { stroke: var(--linha); stroke-width: 1; }
+.grafico .banda { fill: var(--agua-clara); }
+.grafico .linha { fill: none; stroke: var(--tinta); stroke-width: 1.6; }
+.grafico .rega { fill: var(--agua); }
+.grafico text { fill: var(--tinta-2); font: 10px var(--sans); }
+
+/* --- regas --- */
+.regas { list-style: none; margin: 12px 0 0; padding: 0; }
+.regas li { display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding: 8px 0; border-bottom: 1px solid var(--linha); }
+.regas time { color: var(--tinta-2); }
+.regas .ligou { color: var(--agua); font-weight: 600; }
+
+@media (max-width: 760px) {
+  .bancada { grid-template-columns: 1fr; }
+  .topo { flex-direction: column; align-items: flex-start; }
+  .no { text-align: left; }
+  .ambiente dl { grid-template-columns: 1fr 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coluna .agua { transition: none; }
+}

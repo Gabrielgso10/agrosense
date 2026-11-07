@@ -22,7 +22,7 @@ Decision StepPot(PotState& s, const PotInputs& in) {
     if (!in.soil_valid) return Stop(s, in.now_s, Reason::kStopSensorFault);
     if (p == nullptr || !p->irrigate) return Stop(s, in.now_s, Reason::kBlockedUnknownSpecies);
     if (in.now_s - s.pump_started_s >= p->max_run_s) return Stop(s, in.now_s, Reason::kStopMaxRun);
-    if (in.soil_pct >= p->stop_at_pct) return Stop(s, in.now_s, Reason::kStopWet);
+    if (in.soil_pct >= in.limits.high) return Stop(s, in.now_s, Reason::kStopWet);
     return {true, Reason::kRunning};
   }
 
@@ -31,7 +31,7 @@ Decision StepPot(PotState& s, const PotInputs& in) {
   if (!in.soil_valid) return {false, Reason::kBlockedSensorFault};
   if (!in.tank_ok) return {false, Reason::kBlockedTankLow};
   if (s.has_stopped && in.now_s - s.last_stop_s < p->cooldown_s) return {false, Reason::kBlockedCooldown};
-  if (in.soil_pct < p->start_below_pct) {
+  if (in.soil_pct < in.limits.low) {
     s.pump_on = true;
     s.pump_started_s = in.now_s;
     return {true, Reason::kStartDry};
@@ -55,6 +55,14 @@ const char* ReasonName(Reason r) {
     case Reason::kBlockedCooldown: return "bloqueado_intervalo";
   }
   return "?";
+}
+
+Thresholds ThresholdsFromFao(float p, int field_capacity_pct, int wilting_pct) {
+  if (p < 0.1f) p = 0.1f;
+  if (p > 0.8f) p = 0.8f;
+  const float available = static_cast<float>(field_capacity_pct - wilting_pct);
+  const float low = static_cast<float>(field_capacity_pct) - p * available;
+  return {static_cast<int>(std::lround(low)), field_capacity_pct};
 }
 
 int SoilPercent(float volts, float dry_volts, float wet_volts) {

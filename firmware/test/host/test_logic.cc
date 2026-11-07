@@ -3,6 +3,9 @@
 #include <cstdio>
 #include <cstring>
 
+#include <type_traits>
+
+#include "cycle.h"
 #include "irrigation.h"
 #include "model_settings.h"
 #include "preprocess.h"
@@ -20,10 +23,11 @@ static int g_failures = 0, g_checks = 0;
     }                                                                  \
   } while (0)
 
-static const SpeciesProfile kTestProfile = {"teste", true, 30, 60, 20, 600};
-static const SpeciesProfile kEmptyPot = {"vazio", false, 0, 0, 0, 0};
+static const SpeciesProfile kTestProfile = {"teste", true, 0.30f, 20, 600};
+static const SpeciesProfile kEmptyPot = {"vazio", false, 0.0f, 0, 0};
+static const Thresholds kLimits = {30, 60};  // liga abaixo de 30%, desliga em 60%
 
-static PotInputs Dry(int64_t now) { return {&kTestProfile, true, 20, true, now}; }
+static PotInputs Dry(int64_t now) { return {&kTestProfile, kLimits, true, 20, true, now}; }
 
 static void TestIrrigation() {
   PotState s;
@@ -31,9 +35,9 @@ static void TestIrrigation() {
   CHECK(d.pump_on && d.reason == Reason::kStartDry);
 
   // Histerese: segue ligada entre os limiares e desliga ao chegar em stop_at
-  d = StepPot(s, {&kTestProfile, true, 45, true, 5});
+  d = StepPot(s, {&kTestProfile, kLimits, true, 45, true, 5});
   CHECK(d.pump_on && d.reason == Reason::kRunning);
-  d = StepPot(s, {&kTestProfile, true, 60, true, 8});
+  d = StepPot(s, {&kTestProfile, kLimits, true, 60, true, 8});
   CHECK(!d.pump_on && d.reason == Reason::kStopWet);
 
   // Intervalo mínimo entre regas, mesmo com o solo seco
@@ -48,22 +52,22 @@ static void TestIrrigation() {
 
   // Reservatório vazio impede ligar e desliga bomba em funcionamento
   PotState t;
-  d = StepPot(t, {&kTestProfile, true, 20, false, 0});
+  d = StepPot(t, {&kTestProfile, kLimits, true, 20, false, 0});
   CHECK(!d.pump_on && d.reason == Reason::kBlockedTankLow);
   StepPot(t, Dry(1));
-  d = StepPot(t, {&kTestProfile, true, 20, false, 2});
+  d = StepPot(t, {&kTestProfile, kLimits, true, 20, false, 2});
   CHECK(!d.pump_on && d.reason == Reason::kStopTankLow);
 
   // Espécie desconhecida, vaso vazio e sensor com falha nunca regam
   PotState u;
-  d = StepPot(u, {nullptr, true, 5, true, 0});
+  d = StepPot(u, {nullptr, kLimits, true, 5, true, 0});
   CHECK(!d.pump_on && d.reason == Reason::kBlockedUnknownSpecies);
-  d = StepPot(u, {&kEmptyPot, true, 5, true, 0});
+  d = StepPot(u, {&kEmptyPot, kLimits, true, 5, true, 0});
   CHECK(!d.pump_on && d.reason == Reason::kBlockedNoIrrigation);
-  d = StepPot(u, {&kTestProfile, false, 0, true, 0});
+  d = StepPot(u, {&kTestProfile, kLimits, false, 0, true, 0});
   CHECK(!d.pump_on && d.reason == Reason::kBlockedSensorFault);
   StepPot(u, Dry(1));
-  d = StepPot(u, {&kTestProfile, false, 0, true, 2});
+  d = StepPot(u, {&kTestProfile, kLimits, false, 0, true, 2});
   CHECK(!d.pump_on && d.reason == Reason::kStopSensorFault);
 }
 
@@ -80,6 +84,31 @@ static void TestSpeciesTracker() {
 static void TestProfiles() {
   CHECK(FindProfile("vazio") != nullptr && !FindProfile("vazio")->irrigate);
   CHECK(FindProfile("especie que nao existe") == nullptr);
+  // Fator de depleção p da Tabela 22 da FAO 56
+  CHECK(FindProfile("alface") != nullptr && FindProfile("alface")->depletion_p == 0.30f);
+  CHECK(FindProfile("cebolinha") != nullptr && FindProfile("cebolinha")->depletion_p == 0.30f);
+  CHECK(FindProfile("rucula") != nullptr && FindProfile("rucula")->depletion_p == 0.30f);
+  CHECK(FindProfile("feijao") == nullptr);  // o feijão saiu do projeto
+}
+
+static void TestThresholds() {
+  // Capacidade de campo 70% e ponto de murcha 20%: 50 pontos de água disponível
+  const Thresholds a = ThresholdsFromFao(0.30f, 70, 20);
+  CHECK(a.low == 55 && a.high == 70);
+  const Thresholds f = ThresholdsFromFao(0.45f, 70, 20);
+  CHECK(f.low == 48 && f.high == 70);  // 47,5 arredonda para 48
+  // p fora da faixa da FAO (0,1 a 0,8) é limitado: a histerese nunca some
+  CHECK(ThresholdsFromFao(0.0f, 70, 20).low == 65);
+  CHECK(ThresholdsFromFao(0.95f, 70, 20).low == 30);
+}
+
+static void TestResolveLabel() {
+  const char* labels[] = {"alface", "cebolinha", "rucula"};
+  CHECK(std::strcmp(ResolveSpeciesLabel(nullptr, 1, labels, 3), "cebolinha") == 0);
+  CHECK(std::strcmp(ResolveSpeciesLabel("rucula", -1, labels, 3), "rucula") == 0);  // fixa vale sem confirmação
+  CHECK(std::strcmp(ResolveSpeciesLabel("alface", 2, labels, 3), "alface") == 0);   // e tem prioridade sobre a câmera
+  CHECK(ResolveSpeciesLabel(nullptr, -1, labels, 3) == nullptr);
+  CHECK(ResolveSpeciesLabel(nullptr, 7, labels, 3) == nullptr);  // índice fora da lista
 }
 
 static void TestSoilPercent() {
@@ -130,14 +159,43 @@ static void TestQuantizeImage() {
   CHECK(same);
 }
 
+// O estado guardado na memória RTC precisa ser copiável byte a byte e iniciável em
+// tempo de compilação; caso contrário o C++ o reinicializaria a cada despertar.
+static_assert(std::is_trivially_copyable<PotState>::value, "PotState precisa caber na memória RTC");
+static_assert(std::is_trivially_copyable<SpeciesTracker>::value, "SpeciesTracker precisa caber na memória RTC");
+constexpr SpeciesTracker kCompileTimeTracker(2, 0.6f);
+
+static void TestCycle() {
+  SpeciesTracker trackers[2] = {SpeciesTracker(2, 0.6f), SpeciesTracker(2, 0.6f)};
+  // Primeiro ciclo ou espécie ainda não confirmada: a câmera roda
+  CHECK(NeedsVision(trackers, 2, 100, 0, 3600, true));
+  CHECK(NeedsVision(trackers, 2, 100, 50, 3600, false));
+  for (auto& t : trackers) { t.Update(1, 0.9f); t.Update(1, 0.9f); }
+  // Tudo confirmado e dentro do intervalo: não roda; intervalo vencido: roda
+  CHECK(!NeedsVision(trackers, 2, 100, 50, 3600, false));
+  CHECK(NeedsVision(trackers, 2, 50 + 3600, 50, 3600, false));
+
+  PotState pots[2];
+  CHECK(CanSleep(pots, 2));
+  pots[1].pump_on = true;
+  CHECK(!CanSleep(pots, 2));  // regando: o nó não dorme
+
+  // Mudança da bomba vai com QoS 1 e retenção; leitura periódica, com QoS 0
+  CHECK(PotMessagePolicy(true).qos == 1 && PotMessagePolicy(true).retain);
+  CHECK(PotMessagePolicy(false).qos == 0 && !PotMessagePolicy(false).retain);
+}
+
 int main() {
   TestIrrigation();
   TestSpeciesTracker();
   TestProfiles();
+  TestThresholds();
+  TestResolveLabel();
   TestSoilPercent();
   TestRgb565Decode();
   TestCropResize();
   TestQuantizeImage();
+  TestCycle();
   std::printf("%d verificações, %d falhas\n", g_checks, g_failures);
   return g_failures == 0 ? 0 : 1;
 }

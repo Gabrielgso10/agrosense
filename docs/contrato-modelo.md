@@ -34,7 +34,11 @@ conservador (definir o limiar com a matriz de confusão da S6).
 ## Dataset (Leonardo)
 
 - Uma pasta por classe em `data/<nome da classe>/`; o nome da pasta vira o rótulo.
-- Incluir a classe **vazio/fundo**: com regiões fixas, um espaço pode estar sem vaso.
+- Classes do protótipo: `alface`, `cebolinha`, `rucula` e `vazio` (pastas com esses nomes, sem acento).
+- A classe **vazio** cobre o espaço sem vaso: com regiões fixas, um lugar pode estar vazio.
+- A fonte principal de fotos é a própria câmera do nó: com a espécie fixa, o painel arquiva
+  cada foto e `painel/exportar_dataset.py` gera os recortes rotulados.
+- Troquem os vasos de posição de tempos em tempos, para o modelo aprender a planta e não o lugar.
 - Parte das fotos deve sair da própria câmera do nó (slot microSD), não só do
   celular, para o modelo não estranhar a imagem real.
 - Variar iluminação, ângulo e fundo. As 200 imagens de calibração da quantização
