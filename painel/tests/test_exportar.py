@@ -34,4 +34,6 @@ def test_exporta_recortes_rotulados_pela_especie_fixa(tmp_path):
     assert exportar_dataset.exportar(db, saida) == 2  # sem a câmera rotulando a si mesma
     assert sorted(p.parent.name for p in saida.rglob("*.jpg")) == ["alface", "vazio"]
     assert Image.open(next((saida / "alface").glob("*.jpg"))).size == (106, 106)
+    # a sessão (data) vai no começo do nome, para o train.py separar treino e teste por sessão
+    assert all(p.name[4] == "-" and "__no__" in p.name for p in saida.rglob("*.jpg"))
     assert exportar_dataset.exportar(db, saida) == 0  # rodar de novo não duplica

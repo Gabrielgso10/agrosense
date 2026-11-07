@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgroSense — rotulagem das fotos</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+  <link rel="stylesheet" href="painel.css">
+</head>
+<body>
+  <header class="topo">
+    <div>
+      <h1>Rotulagem das fotos</h1>
+      <p class="sub">Marque cada área de plantio com a espécie confirmada por quem plantou</p>
+    </div>
+    <a class="voltar" href="./">Voltar ao painel</a>
+  </header>
+
+  <p id="aviso" class="aviso" hidden></p>
+
+  <main class="rotulagem">
+    <section class="palco-area" aria-label="Foto">
+      <div class="barra">
+        <label>Lote <select id="lote"></select></label>
+        <span id="posicao" class="nota-forte"></span>
+      </div>
+      <div class="palco-moldura">
+        <div id="palco" class="palco">
+          <img id="foto" alt="" draggable="false">
+          <svg id="marcas" class="marcas"></svg>
+        </div>
+      </div>
+      <p class="nota"><span id="foto-nome"></span> <span id="foto-sessao"></span></p>
+    </section>
+
+    <aside class="ferramentas" aria-label="Rotulagem">
+      <h2>Espécie</h2>
+      <div id="classes" class="classes" role="group" aria-label="Espécie da próxima região"></div>
+      <p class="nota">Arraste sobre a foto para marcar uma área quadrada. Teclas 1 a 4 escolhem a espécie,
+        as setas trocam de foto e Delete apaga a última área.</p>
+
+      <h2>Áreas desta foto</h2>
+      <ol id="regioes" class="regioes"></ol>
+      <div class="acoes">
+        <button type="button" id="sem-planta">Sem planta útil</button>
+        <button type="button" id="anterior">Anterior</button>
+        <button type="button" id="proxima" class="principal">Próxima</button>
+      </div>
+      <p id="status" class="nota" role="status" aria-live="polite"></p>
+
+      <h2>Progresso</h2>
+      <p id="progresso" class="nota-forte"></p>
+      <ol id="lista" class="lista-fotos"></ol>
+
+      <h2>Dataset</h2>
+      <p class="nota">Gera os recortes em data/especies/, com a sessão no nome, prontos para o train.py.</p>
+      <button type="button" id="exportar" class="principal">Exportar recortes</button>
+      <p id="exportado" class="nota" role="status" aria-live="polite"></p>
+    </aside>
+  </main>
+
+  <script src="rotular.js"></script>
+</body>
+</html>

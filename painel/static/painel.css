@@ -147,3 +147,41 @@ button:focus-visible { outline: 3px solid var(--agua); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   .coluna .agua { transition: none; }
 }
+
+/* --- rotulagem das fotos --- */
+.voltar, .menu a { color: var(--tinta); }
+.menu { margin: 6px 0 0; }
+.rotulagem { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
+.barra { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
+.barra select { font: inherit; padding: 4px 8px; margin-left: 6px; }
+.nota-forte { margin: 0; font-weight: 600; }
+.palco-moldura { background: #dfe6dd; border-radius: 6px; padding: 12px; display: flex; justify-content: center; }
+.palco { position: relative; display: inline-block; max-width: 100%; touch-action: none; user-select: none; }
+.palco img { display: block; max-width: 100%; max-height: 74vh; width: auto; height: auto; }
+.marcas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; }
+.marcas text { font-family: var(--sans); }
+.ferramentas { background: var(--superficie); border-top: 3px solid var(--folha); padding: 18px 20px 20px; }
+.ferramentas h2 { font-size: 1.1rem; margin: 20px 0 8px; }
+.ferramentas h2:first-child { margin-top: 0; }
+.ferramentas button { font: inherit; cursor: pointer; }
+.classes { display: grid; gap: 6px; }
+.classes button { display: flex; align-items: center; gap: 8px; text-align: left; padding: 8px 10px;
+  border: 1px solid var(--linha); background: #fff; border-radius: 4px; }
+.classes button[aria-pressed="true"] { border-color: var(--tinta); box-shadow: inset 0 0 0 1px var(--tinta); font-weight: 600; }
+.amostra { width: 12px; height: 12px; border-radius: 2px; display: inline-block; flex: none; }
+.regioes { list-style: none; padding: 0; margin: 0; }
+.regioes li { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.regioes li.vazia { color: var(--tinta-2); }
+.regioes button { margin-left: auto; border: 0; background: none; color: var(--alerta); text-decoration: underline; padding: 0; }
+.acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 12px; }
+.acoes #sem-planta { grid-column: 1 / -1; }
+.acoes button, #exportar { padding: 8px 10px; border: 1px solid var(--linha); background: #fff; border-radius: 4px; }
+.ferramentas button.principal { background: var(--tinta); color: var(--superficie); border-color: var(--tinta); }
+.lista-fotos { list-style: none; padding: 0; margin: 8px 0 0; max-height: 220px; overflow-y: auto; border: 1px solid var(--linha); }
+.lista-fotos button { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: none;
+  padding: 5px 8px; text-align: left; font-size: 0.85rem; }
+.lista-fotos button.atual { background: var(--agua-clara); }
+.marca { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--tinta-2); flex: none; }
+.marca.ok { background: var(--folha); border-color: var(--folha); }
+#status.erro { color: var(--alerta); }
+@media (max-width: 900px) { .rotulagem { grid-template-columns: 1fr; } }

@@ -10,7 +10,7 @@ data/*
 # Lote original de fotos do TCC, importado do Drive
 !data/originais/
 data/originais/*
-!data/originais/2026-11-06/
+!data/originais/*/
 models/saved_model/
 models/*.npz
 models/model.keras

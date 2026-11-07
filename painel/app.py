@@ -10,16 +10,18 @@ import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import Body, FastAPI, HTTPException
 from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
+import rotulagem
 import store
 
 AQUI = Path(__file__).resolve().parent
 
 
-def criar_app(db_path: str | None = None, conectar_mqtt: bool = True) -> FastAPI:
+def criar_app(db_path: str | None = None, conectar_mqtt: bool = True, dados: str | Path | None = None) -> FastAPI:
+    dados = Path(dados or os.environ.get("AGROSENSE_DADOS", AQUI.parent / "data"))
     db_path = db_path or os.environ.get("AGROSENSE_DB", str(AQUI / "agrosense.db"))
     host = os.environ.get("AGROSENSE_MQTT_HOST", "localhost")
     porta = int(os.environ.get("AGROSENSE_MQTT_PORT", "1883"))
@@ -74,6 +76,38 @@ def criar_app(db_path: str | None = None, conectar_mqtt: bool = True) -> FastAPI
             return JSONResponse({"erro": "Ainda não chegou nenhuma foto: ela vem depois da primeira classificação "
                                          "da câmera."}, status_code=404)
         return Response(f[0], media_type="image/jpeg", headers={"Cache-Control": "no-store"})
+
+    # --- rotulagem das fotos originais (data/originais/<lote>/) ---
+    def _ou_400(funcao, *args, **kwargs):
+        try:
+            return funcao(*args, **kwargs)
+        except ValueError as erro:
+            raise HTTPException(status_code=400, detail=str(erro)) from erro
+
+    @app.get("/api/rotulagem/lotes")
+    def api_lotes():
+        return rotulagem.listar_lotes(dados)
+
+    @app.get("/api/rotulagem/lotes/{lote}")
+    def api_lote(lote: str):
+        return {"lote": lote, "classes": list(rotulagem.CLASSES), "fotos": _ou_400(rotulagem.fotos_do_lote, dados, lote)}
+
+    @app.get("/api/rotulagem/lotes/{lote}/fotos/{arquivo}")
+    def api_foto_original(lote: str, arquivo: str):
+        import io
+
+        imagem = rotulagem.abrir(_ou_400(rotulagem.caminho_foto, dados, lote, arquivo))
+        buf = io.BytesIO()
+        imagem.save(buf, "JPEG", quality=90)
+        return Response(buf.getvalue(), media_type="image/jpeg")
+
+    @app.put("/api/rotulagem/lotes/{lote}/fotos/{arquivo}")
+    def api_salvar_rotulos(lote: str, arquivo: str, corpo: dict = Body(...)):
+        return _ou_400(rotulagem.salvar, dados, lote, arquivo, corpo.get("regioes", []), corpo.get("revisada", True))
+
+    @app.post("/api/rotulagem/exportar")
+    def api_exportar():
+        return rotulagem.exportar(dados, dados / "especies")
 
     app.mount("/", StaticFiles(directory=AQUI / "static", html=True), name="static")
     return app

@@ -30,7 +30,8 @@ def exportar(db_path, saida, incluir_camera: bool = False) -> int:
                 rotulo = a["especies"].get(n)
                 if rotulo is None or (not rotulo["fixa"] and not incluir_camera):
                     continue
-                destino = saida / rotulo["especie"] / f"{datetime.fromtimestamp(a['ts']):%Y%m%d_%H%M%S}_vaso{n}.jpg"
+                momento = datetime.fromtimestamp(a["ts"])  # sessão = dia da foto, no começo do nome
+                destino = saida / rotulo["especie"] / f"{momento:%Y-%m-%d}__no__{momento:%H%M%S}_vaso{n}.jpg"
                 if destino.exists():
                     continue
                 imagem = imagem or Image.open(io.BytesIO(a["jpeg"])).convert("RGB")

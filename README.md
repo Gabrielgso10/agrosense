@@ -36,7 +36,9 @@ A cada push, o GitHub Actions roda os três conjuntos de testes (`.github/workfl
 | Pipeline completo em dataset sintético, com pesos ImageNet | treino → int8 → comparação OK |
 | LiteRT (kernels de referência) × TFLM | 0 LSB de diferença |
 | Testes da lógica do firmware no PC (`run.sh`) | 54 verificações, 0 falhas |
-| Testes do painel (`pytest` em `painel/`): armazenamento, API e exportação do dataset | 12 passando |
+| Testes do pipeline de treino, incluindo a separação por sessão | 23 passando |
+| Testes do painel (`pytest` em `painel/`): armazenamento, API, rotulagem e exportação | 18 passando |
+| Rotulagem usada num navegador real com as 71 fotos: área desenhada, salva e exportada | ok |
 | Painel aberto num navegador real, em tela de computador e de celular, com dados simulados | sem erros no console |
 | Sono profundo e MQTT (QoS, retenção, testamento): funções conferidas no ESP-IDF 5.5.5 e no esp-mqtt; firmware compilado com e sem sono profundo, em C++17 e C++20 | 0 avisos |
 | Recorte + redimensionamento do firmware × `tf.image.resize` do treino | diferença 0 em 5 recortes |
@@ -64,7 +66,7 @@ firmware/main/
     classifier.*  camera.*  sensors.*  actuators.*  telemetry.*
   generated/                  saída do convert.py e do compare.py (não edite)
 firmware/test/host/           testes da lógica e paridade com o TensorFlow
-painel/                       painel de acompanhamento, simulador e exportador do dataset
+painel/                       painel de acompanhamento, rotulagem das fotos, simulador e exportadores
 docs/contrato-modelo.md       acordo entre treino, firmware e dataset
 ```
 
@@ -90,12 +92,17 @@ cd training && python -m pytest        # 17 passed
 ```bash
 cd training
 python train.py                          # tf_flowers como placeholder
-python train.py --data-dir ../data/especies --epochs 10   # dataset do grupo
+python train.py --data-dir ../data/especies --teste-ultima-sessao --ajuste-fino 5   # dataset do grupo
 python convert.py
 python compare.py
 ```
 
 `models/compare_report.md` e `models/confusion_matrix_tflm.png` vão direto para o cap. 3.
+
+Com `--teste-ultima-sessao`, a sessão de fotos mais recente fica inteira fora do treino e vira o
+teste do cap. 3; `models/divisao.json` registra qual foi. Sem a opção, a divisão é aleatória e
+pode pôr fotos quase iguais da mesma sessão no treino e na validação, inflando a acurácia.
+`--ajuste-fino` libera as últimas camadas da MobileNetV2 por mais algumas épocas.
 
 ## 3. Firmware no ESP32-S3
 
@@ -194,6 +201,22 @@ espécie sem perfil também não.
 
 As mensagens de vaso também levam a espécie, se ela é fixa, a confiança da câmera e os
 limiares em uso.
+
+## Rotulagem das fotos
+
+As fotos de celular ficam em `data/originais/<lote>/`, uma pasta por lote, com um `manifesto.json`
+que registra nome, tamanho e SHA-256 de cada foto. Para rotular:
+
+1. `cd painel` e `python app.py`; abra `http://localhost:8000/rotular.html`.
+2. Escolha a espécie (teclas 1 a 4) e arraste sobre a foto para marcar cada área de plantio num
+   quadrado. Se a foto não tiver planta aproveitável, use "Sem planta útil". As áreas ficam em
+   `data/originais/<lote>/rotulos.json`, versionado junto com as fotos.
+3. "Exportar recortes" gera `data/especies/<espécie>/<sessão>__<lote>__<foto>__r<n>.jpg`, pronto
+   para o `train.py`. Exportar de novo refaz os recortes, então mudar um rótulo nunca deixa recorte velho.
+
+A sessão é a data da foto, lida do nome do arquivo (como em `IMG-20261105-WA0020.jpg`), ou o nome
+do lote quando o arquivo não traz data. Para um lote novo, copie as fotos para uma pasta nova em
+`data/originais/` e gere o manifesto: `python criar_manifesto.py ../data/originais/<lote>`.
 
 ## Painel de acompanhamento
 
