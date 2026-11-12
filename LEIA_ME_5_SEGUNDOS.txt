@@ -1,0 +1,36 @@
+AGROSENSE | INICIALIZADOR OCULTO + PAINEL A CADA 5 SEGUNDOS
+
+1) Feche os CMDs antigos que executavam py app.py, py simular.py ou a ponte (Ctrl+C).
+   O servico Mosquitto pode continuar funcionando.
+
+2) Extraia este ZIP e copie TODOS os arquivos dele para a pasta raiz do
+   seu repositorio agrosense (junto das pastas painel, training e simulacao).
+   Aceite substituir INICIAR_AGROSENSE_TUDO.bat e iniciar_agrosense.py.
+   Nao remova nem substitua URL_WOKWI_3_BOMBAS.txt: ele ja tem o link salvo.
+
+3) Execute INICIAR_AGROSENSE_TUDO.bat (duplo clique).
+   O CMD do atalho pode piscar por uma fracao de segundo, mas nao ficara aberto.
+   Se quiser nem esse flash, abra INICIAR_AGROSENSE_OCULTO.vbs diretamente.
+
+4) O programa abrira o localhost:8000 e o Wokwi no navegador.
+   Clique Start Simulation no Wokwi. O painel atualiza sozinho a cada 5 segundos,
+   sem recarregar a pagina inteira.
+
+5) No primeiro uso, atualize o navegador com Ctrl+F5 para evitar cache antigo.
+
+PARAR: clique em PARAR_AGROSENSE.bat.
+Isso encerra somente o painel e a ponte que o iniciador abriu.
+O Mosquitto como servico do Windows continua ativo.
+
+ERROS: clique em ABRIR_LOGS_AGROSENSE.bat.
+Logs em %%LOCALAPPDATA%%\AgroSense\logs (painel.log, ponte.log e inicializador.log).
+Se houver erro de dependencias, rode na raiz:
+  py -m pip install -r painel\requirements.txt
+
+ALTERACOES AUTOMATICAS: na primeira inicializacao, o Python modifica somente
+painel/static/painel.js (troca 15000 por 5000 ms) e painel/static/index.html
+(troca src do JS para renovar cache). Nao altera codigo da IA, arquivos do
+Wokwi, bridge, dataset, firmware nem o banco de dados.
+
+OBS: se outro painel ja estiver rodando na porta 8000, ele sera reaproveitado.
+Para executar tudo sem nenhum terminal visivel, encerre instancias antigas.

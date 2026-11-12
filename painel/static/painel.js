@@ -251,4 +251,4 @@ document.querySelectorAll(".janela button").forEach((botao) => {
 });
 
 atualizar();
-setInterval(atualizar, 15000);
+setInterval(atualizar, 5000);
