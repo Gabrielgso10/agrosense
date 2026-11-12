@@ -7,6 +7,9 @@ __pycache__/
 # Dados e artefatos grandes (o .tflite e os fontes gerados do firmware SÃO versionados)
 data/*
 !data/.gitkeep
+# Lote compactado de fotos do TCC, importado do Drive
+!data/especies/
+!data/especies/**
 # Lote original de fotos do TCC, importado do Drive
 !data/originais/
 data/originais/*
